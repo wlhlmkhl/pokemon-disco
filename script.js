@@ -18,10 +18,12 @@ const typeColor = {
   water: "#0190FF",
 };
 const baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=151";
-const selectBtnOne = document.querySelector("#select-button-one");
-const selectBtnTwo = document.querySelector("#select-button-two");
+const dropDownPokemonOne = document.querySelector("#select-dropdown-one");
+const dropDownPokemonTwo = document.querySelector("#select-dropdown-two");
 let pokemonOne;
 let pokemonTwo;
+const compareButton = document.querySelector("#compare-button");
+const battleButton = document.querySelector("#battle-button");
 
 // Class
 
@@ -35,7 +37,20 @@ class Pokemon {
     this.stats = stats;
   }
   compare(pokemon) {
-    //???
+    let thisPokemonOverallStats = this.stats.reduce((total, stat) => {
+      return total + stat.base_stat;
+    }, 0);
+    let contenderPokemonOverallStats = pokemon.stats.reduce((total, stat) => {
+      return total + stat.base_stat;
+    }, 0);
+
+    if (thisPokemonOverallStats > contenderPokemonOverallStats) {
+      return `${this.name} is superior to ${pokemon.name}`;
+    } else if (thisPokemonOverallStats < contenderPokemonOverallStats) {
+      return `${this.name} is inferior to ${pokemon.name}`;
+    } else {
+      return `${this.name} is equally strong as ${pokemon.name}`;
+    }
   }
 }
 
@@ -49,11 +64,9 @@ async function getPokemonList(url) {
     console.log("err: ", error);
   }
 }
-async function populateDropdown() {
-  const dropDownPokemonOne = document.querySelector("#select-dropdown-one");
-  const dropDownPokemonTwo = document.querySelector("#select-dropdown-two");
+async function populateDropdown(...elem) {
   let array = await getPokemonList(baseUrl);
-  createOptionsForDropdown(array, dropDownPokemonOne, dropDownPokemonTwo);
+  createOptionsForDropdown(array, ...elem);
 }
 function createOptionsForDropdown(array, ...dropdowns) {
   dropdowns.forEach((dropdown) => {
@@ -115,10 +128,12 @@ function fetchOneOrTwo(id) {
       break;
   }
 }
-function createPokemonCard(object) {
+function createPokemonCard(object, id) {
   console.log(object);
   const themeColor = typeColor[object.types[0].type.name];
-  let card = document.querySelector("#card");
+  let cardId = id === "one" ? "card-one" : "card-two";
+  let card = document.querySelector(`#${cardId}`);
+  card.innerHTML = "";
   card.innerHTML = `
         <p class="hp">
           <span>HP</span>
@@ -171,22 +186,24 @@ async function handleSelectClick(url, id) {
   let pokemonObj = await getPokemonData(url);
   capturePokemon(pokemonObj, id);
   let pokemon = fetchOneOrTwo(id);
-  createPokemonCard(pokemon);
+  createPokemonCard(pokemon, id);
 }
 
-//
-// KOD & DOM
-populateDropdown();
+// KOD-FLOW & DOM
+populateDropdown(dropDownPokemonOne, dropDownPokemonTwo);
 
-selectBtnOne.addEventListener("click", (event) => {
-  let url = document.querySelector("#select-dropdown-one").value;
+dropDownPokemonOne.addEventListener("change", (event) => {
+  let url = dropDownPokemonOne.value;
   let id = event.target.id.slice(-3);
   handleSelectClick(url, id);
-  console.log(pokemonOne);
 });
-selectBtnTwo.addEventListener("click", (event) => {
-  let url = document.querySelector("#select-dropdown-one").value;
+dropDownPokemonTwo.addEventListener("change", (event) => {
+  let url = dropDownPokemonTwo.value;
   let id = event.target.id.slice(-3);
   handleSelectClick(url, id);
-  console.log(pokemonTwo);
+});
+compareButton.addEventListener("click", () => {
+  let messageContainer = document.querySelector("#message-container");
+  let msg = pokemonOne.compare(pokemonTwo);
+  messageContainer.textContent = msg;
 });

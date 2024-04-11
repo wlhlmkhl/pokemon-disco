@@ -9,6 +9,8 @@ body {
 }
 section {
   display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 .card-container {
   width: 350px;
