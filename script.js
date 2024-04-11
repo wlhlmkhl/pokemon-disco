@@ -1,7 +1,25 @@
 // Globals
+const typeColor = {
+  bug: "#26de81",
+  dragon: "#ffeaa7",
+  electric: "#fed330",
+  fairy: "#FF0069",
+  fighting: "#30336b",
+  fire: "#f0932b",
+  flying: "#81ecec",
+  grass: "#00b894",
+  ground: "#EFB549",
+  ghost: "#a55eea",
+  ice: "#74b9ff",
+  normal: "#95afc0",
+  poison: "#6c5ce7",
+  psychic: "#a29bfe",
+  rock: "#2d3436",
+  water: "#0190FF",
+};
 const baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=151";
 const selectBtnOne = document.querySelector("#select-button-one");
-const dropDownPokemonOne = document.querySelector("#select-dropdown-one");
+const selectBtnTwo = document.querySelector("#select-button-two");
 let pokemonOne;
 let pokemonTwo;
 
@@ -31,16 +49,20 @@ async function getPokemonList(url) {
     console.log("err: ", error);
   }
 }
-async function populateDropdown(dropdown) {
+async function populateDropdown() {
+  const dropDownPokemonOne = document.querySelector("#select-dropdown-one");
+  const dropDownPokemonTwo = document.querySelector("#select-dropdown-two");
   let array = await getPokemonList(baseUrl);
-  createOptionsForDropdown(array, dropdown);
+  createOptionsForDropdown(array, dropDownPokemonOne, dropDownPokemonTwo);
 }
-function createOptionsForDropdown(array, dropdown) {
-  array.forEach((pokemon) => {
-    let newOption = document.createElement("option");
-    newOption.value = pokemon.url;
-    newOption.textContent = pokemon.name.toUpperCase();
-    dropdown.append(newOption);
+function createOptionsForDropdown(array, ...dropdowns) {
+  dropdowns.forEach((dropdown) => {
+    array.forEach((pokemon) => {
+      let newOption = document.createElement("option");
+      newOption.value = pokemon.url;
+      newOption.textContent = pokemon.name.toUpperCase();
+      dropdown.append(newOption);
+    });
   });
 }
 async function getData(url) {
@@ -93,33 +115,78 @@ function fetchOneOrTwo(id) {
       break;
   }
 }
-function createPokemonCard(object) {}
-function renderPokemon(object) {
+function createPokemonCard(object) {
   console.log(object);
-  let container = document.querySelector("#card-container");
-  container.innerHTML = "";
-  let card = document.createElement("div");
-  let img = document.createElement("img");
-  img.src = object.image;
-  img.alt = `a pokemon named ${object.name}`;
-  img.classList.add("img");
-  card.append(img);
-  container.append(card);
-}
-async function handleSelectClick(url, id) {
-  let pokemonObj = await getPokemonData(url);
-  console.log(pokemonObj);
-  capturePokemon(pokemonObj, id);
-  let pokemon = fetchOneOrTwo(id);
-  renderPokemon(pokemon);
+  const themeColor = typeColor[object.types[0].type.name];
+  let card = document.querySelector("#card");
+  card.innerHTML = `
+        <p class="hp">
+          <span>HP</span>
+            ${object.stats[0].base_stat}
+        </p>
+        <img src=${object.image} />
+        <h2 class="poke-name">${object.name.toUpperCase()}</h2>
+        <div id="types"class="types">
+        </div>
+        <div class="stats">
+          <div>
+            <h3>${object.stats[1].base_stat}</h3>
+            <p>Attack</p>
+            <h3>${object.stats[3].base_stat}</h3>
+            <p>Special Attack</p>
+          </div>
+          <div>
+            <h3>${object.stats[2].base_stat}</h3>
+            <p>Defense</p>
+            <h3>${object.stats[4].base_stat}</h3>
+            <p>Special Defense</p>
+          </div>
+          <div>
+            <h3>${object.stats[5].base_stat}</h3>
+            <p>Speed</p>
+          </div>
+        </div>
+  `;
+  appendTypes(object.types);
+  styleCard(themeColor, card);
 }
 
-// DOM
-dropDownPokemonOne.addEventListener("click", (event) => {
-  populateDropdown(event.target);
-});
+function appendTypes(array) {
+  console.log(array);
+  array.forEach((type) => {
+    let span = document.createElement("span");
+    span.textContent = type.type.name;
+    document.querySelector(".types").append(span);
+  });
+}
+function styleCard(color, card) {
+  card.style.background = `radial-gradient(circle at 50% 0%, ${color} 36%, #ffffff 36%)`;
+  card.style.boxShadow = `0 20px 30px rgba(0, 0, 0, 0.15)`;
+  card.querySelectorAll(".types span").forEach((typeColor) => {
+    typeColor.style.backgroundColor = color;
+  });
+}
+
+async function handleSelectClick(url, id) {
+  let pokemonObj = await getPokemonData(url);
+  capturePokemon(pokemonObj, id);
+  let pokemon = fetchOneOrTwo(id);
+  createPokemonCard(pokemon);
+}
+
+//
+// KOD & DOM
+populateDropdown();
+
 selectBtnOne.addEventListener("click", (event) => {
-  let url = dropDownPokemonOne.value;
+  let url = document.querySelector("#select-dropdown-one").value;
   let id = event.target.id.slice(-3);
   handleSelectClick(url, id);
+  console.log(pokemonOne);
+});
+selectBtnTwo.addEventListener("click", (event) => {
+  let url = document.querySelector("#select-dropdown-one").value;
+  let id = event.target.id.slice(-3);
+  handleSelectClick(url, id);
+  console.log(pokemonTwo);
 });

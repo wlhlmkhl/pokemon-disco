@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pokemon-Disco</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="style.css" />
@@ -12,28 +11,30 @@
   </head>
 
   <body>
-    <div class="container mx-auto">
-      <h1 class="text-3xl font-bold text-center mt-10">Pokemon-Disco</h1>
-      <p class="text-lg text-center mt-5">
-        Välj en eller två pokemon från gen 1!
-      </p>
-    </div>
-    <div class="container">
+    <main>
       <div class="container">
-        <select
-          class="m-3 block bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 rounded-md shadow-sm focus:outline-none focus:border-grey-900"
-          id="select-dropdown-one"
-        >
-          <option disabled selected>Choose One</option>
-        </select>
-        <button
-          id="select-button-one"
-          class="bg-red-700 hover:bg-red-900 text-white m-3 font-bold py-2 px-4 rounded"
-        >
-          Select Pokemon
-        </button>
-        <div id="card-container"></div>
+        <h1>Pokemon-Disco</h1>
       </div>
-    </div>
+      <section>
+        <div class="container">
+          <select id="select-dropdown-one">
+            <option disabled selected>Choose One</option>
+          </select>
+          <button id="select-button-one">Select Pokemon</button>
+          <div class="card-container">
+            <div id="card"></div>
+          </div>
+        </div>
+        <div class="container">
+          <select id="select-dropdown-two">
+            <option disabled selected>Choose One</option>
+          </select>
+          <button id="select-button-two">Select Pokemon</button>
+          <div class="card-container">
+            <div id="card"></div>
+          </div>
+        </div>
+      </section>
+    </main>
   </body>
 </html>
