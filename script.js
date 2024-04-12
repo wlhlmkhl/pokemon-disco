@@ -25,18 +25,22 @@ let pokemonTwo;
 const compareButton = document.querySelector("#compare-button");
 const battleButton = document.querySelector("#battle-button");
 
-// Class
+// Class & funktioner som används i Class
 
 class Pokemon {
-  constructor(name, image, types, weight, height, stats) {
+  constructor(name, image, types, weight, height, stats, moves) {
     this.name = name;
     this.image = image;
     this.types = types;
     this.weight = weight;
     this.height = height;
     this.stats = stats;
+    this.moves = moves;
   }
   compare(pokemon) {
+    //JAMFÖR LÄNGD & VIKT
+
+    // JÄMFÖR STATS
     let thisPokemonOverallStats = this.stats.reduce((total, stat) => {
       return total + stat.base_stat;
     }, 0);
@@ -45,12 +49,17 @@ class Pokemon {
     }, 0);
 
     if (thisPokemonOverallStats > contenderPokemonOverallStats) {
-      return `${this.name} is superior to ${pokemon.name}`;
+      let cardOne = document.querySelector("#card-one");
+      cardOne.classList.add("winning-card");
+      return `${this.name} is superior in overall stats to ${pokemon.name}`;
     } else if (thisPokemonOverallStats < contenderPokemonOverallStats) {
-      return `${this.name} is inferior to ${pokemon.name}`;
+      return `${this.name} is inferior with its overall stats to ${pokemon.name}`;
     } else {
       return `${this.name} is equally strong as ${pokemon.name}`;
     }
+  }
+  battle() {
+    console.log(this.moves);
   }
 }
 
@@ -102,8 +111,10 @@ function capturePokemon(object, id) {
     object.types,
     object.weight,
     object.height,
-    object.stats
+    object.stats,
+    object.moves[0].move.name
   );
+
   assignOneOrTwo(pokemon, id);
 }
 function assignOneOrTwo(pokemon, id) {
@@ -121,63 +132,72 @@ function assignOneOrTwo(pokemon, id) {
 function fetchOneOrTwo(id) {
   switch (id) {
     case "one":
-      return pokemonOne;
+      return { pokemonOne: pokemonOne };
     case "two":
-      return pokemonTwo;
+      return { pokemonTwo: pokemonTwo };
     default:
       break;
   }
 }
+
 function createPokemonCard(object, id) {
-  console.log(object);
-  const themeColor = typeColor[object.types[0].type.name];
+  const key = Object.keys(object)[0];
+  const pokemon = object[key];
+  const themeColor = typeColor[pokemon.types[0].type.name];
   let cardId = id === "one" ? "card-one" : "card-two";
+  let typeId = id === "one" ? "types-one" : "types-two";
   let card = document.querySelector(`#${cardId}`);
   card.innerHTML = "";
   card.innerHTML = `
-        <p class="hp">
-          <span>HP</span>
-            ${object.stats[0].base_stat}
-        </p>
-        <img src=${object.image} />
-        <h2 class="poke-name">${object.name.toUpperCase()}</h2>
-        <div id="types"class="types">
-        </div>
-        <div class="stats">
-          <div>
-            <h3>${object.stats[1].base_stat}</h3>
-            <p>Attack</p>
-            <h3>${object.stats[3].base_stat}</h3>
-            <p>Special Attack</p>
-          </div>
-          <div>
-            <h3>${object.stats[2].base_stat}</h3>
-            <p>Defense</p>
-            <h3>${object.stats[4].base_stat}</h3>
-            <p>Special Defense</p>
-          </div>
-          <div>
-            <h3>${object.stats[5].base_stat}</h3>
-            <p>Speed</p>
-          </div>
-        </div>
-  `;
-  appendTypes(object.types);
-  styleCard(themeColor, card);
+  <p class="hp">
+    <span>HP</span>
+      ${pokemon.stats[0].base_stat}
+  </p>
+  <img src=${pokemon.image}
+  alt="a pokemon named ${pokemon.name}"
+  class="img" />
+  <h2 class="poke-name">${pokemon.name.toUpperCase()}</h2>
+  <div class="types ${typeId}">
+  </div>
+  <div class="stats">
+    <div>
+      <h3>${pokemon.stats[1].base_stat}</h3>
+      <p>Attack</p>
+      <h3>${pokemon.stats[3].base_stat}</h3>
+      <p>Special Attack</p>
+    </div>
+    <div>
+      <h3>${pokemon.stats[5].base_stat}</h3>
+      <p>Speed</p>
+      <h3>${pokemon.weight}</h3>
+      <p>Weight</p>
+      <h3>${pokemon.height}</h3>
+      <p>Height</p>
+    </div>
+    <div>
+      <h3>${pokemon.stats[2].base_stat}</h3>
+      <p>Defense</p>
+      <h3>${pokemon.stats[4].base_stat}</h3>
+      <p>Special Defense</p>
+    </div>
+  </div>
+`;
+
+  appendTypes(pokemon.types, typeId);
+  styleCard(themeColor, card, typeId);
 }
 
-function appendTypes(array) {
-  console.log(array);
+function appendTypes(array, id) {
   array.forEach((type) => {
     let span = document.createElement("span");
     span.textContent = type.type.name;
-    document.querySelector(".types").append(span);
+    document.querySelector(`.${id}`).append(span);
   });
 }
-function styleCard(color, card) {
+function styleCard(color, card, id) {
   card.style.background = `radial-gradient(circle at 50% 0%, ${color} 36%, #ffffff 36%)`;
   card.style.boxShadow = `0 20px 30px rgba(0, 0, 0, 0.15)`;
-  card.querySelectorAll(".types span").forEach((typeColor) => {
+  card.querySelectorAll(`.${id} span`).forEach((typeColor) => {
     typeColor.style.backgroundColor = color;
   });
 }
@@ -186,6 +206,7 @@ async function handleSelectClick(url, id) {
   let pokemonObj = await getPokemonData(url);
   capturePokemon(pokemonObj, id);
   let pokemon = fetchOneOrTwo(id);
+  console.log(pokemon);
   createPokemonCard(pokemon, id);
 }
 

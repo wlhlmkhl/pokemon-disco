@@ -17,14 +17,13 @@ section {
   top: 50%;
   left: 50%;
 }
-#card {
-  /* border: red solid 1px; */
+.card-one,
+.card-two {
   width: 100%;
   padding: 30px 20px;
-  /* box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15); */
   border-radius: 10px;
 }
-#card img {
+.img {
   display: block;
   width: 180px;
   max-height: 200px;
@@ -63,9 +62,33 @@ section {
 .stats {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   text-align: center;
 }
 .stats p {
   color: #404060;
+}
+
+/* styling för vinst */
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.winning-card {
+  animation: bounce 1s ease 5;
+  border: 3px solid gold; /* Guld Border */
+  box-shadow: 0 0 10px gold; /* Guldskugga */
 }
