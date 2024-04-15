@@ -8,9 +8,24 @@ body {
   background-color: #eff3ff;
 }
 section {
+  margin: 0;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+}
+.title {
+  display: flex;
+  justify-content: center; /* Centrera innehållet horisontellt */
+  align-items: center; /* Centrera innehållet vertikalt (om det behövs) */
+}
+.title img {
+  width: 50rem;
+}
+.select-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centrera innehållet horisontellt */
+  align-items: center; /* Centrera innehållet vertikalt */
 }
 .card-container {
   width: 350px;
@@ -25,7 +40,7 @@ section {
 }
 .img {
   display: block;
-  width: 180px;
+  width: 100%;
   max-height: 200px;
   position: relative;
   margin: 20px auto;
@@ -68,6 +83,104 @@ section {
 .stats p {
   color: #404060;
 }
+#action-container {
+  display: flex;
+  flex-direction: column; /* Placera elementen i en kolumn */
+  justify-content: center; /* Centrera innehållet horisontellt */
+  align-items: center; /* Centrera innehållet vertikalt */
+  justify-content: space-evenly;
+  height: auto;
+}
+#action-container > * {
+  margin: 5px 0;
+}
+.custom-button {
+  /* Ta bort standardknappens utseende */
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.custom-button img {
+  /* Visa bara bilden */
+  display: block;
+  width: 100%; /* Justera bilden efter knappens storlek */
+  height: auto;
+}
+
+section {
+  background-color: #f2f2f2; /* Ljusgrå bakgrundsfärg */
+  padding: 20px; /* Yttre utfyllnad */
+  /* margin-top: 20px; Avstånd från toppen av sidan */
+}
+
+#message-container {
+  font-size: 24px; /* Typsnittsstorlek för meddelanden */
+  color: #333; /* Textfärg */
+  margin-top: 10px; /* Avstånd från överordnad element */
+
+  border-radius: 5px; /* Avrundade hörn */
+  padding: 15px; /* Utfyllnad för att separera innehåll */
+}
+select {
+  margin-bottom: 5px;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #000;
+  border-radius: 5px;
+  background-color: #f1f1f1;
+  color: #000;
+  -webkit-appearance: none; /* Ta bort standardpil i Chrome och Safari */
+  background-image: url("/assets/icons/icons8-pokeball-color/pokeball-48.png");
+  background-size: 20px; /* Ställ in storlek på bakgrundsbilden */
+  background-repeat: no-repeat; /* Se till att bakgrundsbilden inte upprepas */
+  background-position: right center; /* Placera bakgrundsbilden till höger och centrera den vertikalt */
+  padding-right: 30px; /* Ge tillräckligt med utrymme för att rymma bakgrundsbilden */
+}
+
+/* Styla hover- och focus-tillståndet för select-taggen */
+select:hover,
+select:focus {
+  border-color: #555;
+}
+
+/* Styla option-taggar inuti select-taggen */
+option {
+  padding: 5px;
+}
+
+.button {
+  /* display: inline-block; */
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Primära knappstilar */
+.primary-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Sekundära knappstilar */
+.secondary-button {
+  background-color: #f8c931;
+  color: #333;
+}
+
+.secondary-button:hover {
+  background-color: #ffdb4d;
+}
 
 /* styling för vinst */
 
@@ -88,7 +201,42 @@ section {
 }
 
 .winning-card {
-  animation: bounce 1s ease 5;
-  border: 3px solid gold; /* Guld Border */
-  box-shadow: 0 0 10px gold; /* Guldskugga */
+  animation: bounce 1s ease infinite;
+  border: 6px solid #f8c931; /* Guld Border alt. borde byta färg till pokemongul   */
+  box-shadow: 0 0 10px #f8c931; /* Guldskugga */
+}
+
+/* Animation för slaget från card-one till card-two */
+@keyframes punchToTwoAnimation {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(50px) rotate(20deg); /* Justera värdena för att passa bättre */
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Animation för slaget från card-two till card-one */
+@keyframes punchToOneAnimation {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-50px) rotate(-20deg);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Stil för att aktivera animationen */
+.punch-to-two {
+  animation: punchToTwoAnimation 0.5s ease;
+}
+
+.punch-to-one {
+  animation: punchToOneAnimation 0.5s ease;
 }

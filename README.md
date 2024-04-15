@@ -25,4 +25,12 @@ Visa ut den valda Pokemonen med alla dess tillhörande värden.
 - Turades om att attackera tills en av deras HP når 0.
 - Började striden med den Pokemon med högst speed.
 - Beräknade skadan och uppdaterade HP för respektive Pokemon efter varje attack.
+  -Bägge Pokemon turas om att attackera varandra, tills en av deras HP (Hit points) når 0.
+  Namnet på en Pokemon attack är den första i dess “moves”-lista.
+  Damage calculation formula:
+  Attackerande Pokemon (röd) - Försvarande Pokemon (blå)
+  (Attack+Special Attack) - (Defense+Special defense) \* 0.8 = Skada
+  Subtrahera den försvarande Pokemons HP med den gjorda skadan.
+  Varje attack måste göra minst 10 i skada. T.ex om den beräknade skadan är 4, ändra det till 10.
+
 - Skrev ut kampens förlopp i DOM:en.

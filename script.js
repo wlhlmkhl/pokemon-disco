@@ -24,6 +24,8 @@ let pokemonOne;
 let pokemonTwo;
 const compareButton = document.querySelector("#compare-button");
 const battleButton = document.querySelector("#battle-button");
+const diceButton = document.querySelector("#dice-button");
+const pokeballButton = document.querySelector("#pokeball-button");
 
 // Class & funktioner som används i Class
 
@@ -38,33 +40,210 @@ class Pokemon {
     this.moves = moves;
   }
   compare(pokemon) {
-    //JAMFÖR LÄNGD & VIKT
+    let thisPokemon = extractValues(this);
+    let contenderPokemon = extractValues(pokemon);
 
-    // JÄMFÖR STATS
-    let thisPokemonOverallStats = this.stats.reduce((total, stat) => {
-      return total + stat.base_stat;
-    }, 0);
-    let contenderPokemonOverallStats = pokemon.stats.reduce((total, stat) => {
-      return total + stat.base_stat;
-    }, 0);
+    let thisPokemonScore = 0;
+    let contenderPokemonScore = 0;
 
-    if (thisPokemonOverallStats > contenderPokemonOverallStats) {
-      let cardOne = document.querySelector("#card-one");
-      cardOne.classList.add("winning-card");
-      return `${this.name} is superior in overall stats to ${pokemon.name}`;
-    } else if (thisPokemonOverallStats < contenderPokemonOverallStats) {
-      return `${this.name} is inferior with its overall stats to ${pokemon.name}`;
+    // Jämför stats
+    for (let i = 0; i < thisPokemon.stats.length; i++) {
+      if (thisPokemon.stats[i] > contenderPokemon.stats[i]) {
+        thisPokemonScore++;
+      } else if (thisPokemon.stats[i] < contenderPokemon.stats[i]) {
+        contenderPokemonScore++;
+      }
+    }
+    // Jämför weight och height
+    if (thisPokemon.weight > contenderPokemon.weight) {
+      thisPokemonScore++;
+    } else if (thisPokemon.weight < contenderPokemon.weight) {
+      contenderPokemonScore++;
+    }
+    if (thisPokemon.height > contenderPokemon.height) {
+      thisPokemonScore++;
+    } else if (thisPokemon.height < contenderPokemon.height) {
+      contenderPokemonScore++;
+    }
+    let msg = "";
+    if (thisPokemonScore > contenderPokemonScore) {
+      winnerCard("#card-one");
+      msg = `${this.name
+        .toUpperCase()
+        .bold()} is the superior in more fields than ${pokemon.name
+        .toUpperCase()
+        .bold()}`;
+    } else if (thisPokemonScore < contenderPokemonScore) {
+      winnerCard("#card-two");
+      msg = `${this.name
+        .toUpperCase()
+        .bold()} is inferior in more fields than the mighty ${pokemon.name
+        .toUpperCase()
+        .bold()}`;
     } else {
-      return `${this.name} is equally strong as ${pokemon.name}`;
+      winnerCard("#card-one");
+      winnerCard("#card-two");
+      msg = `${this.name
+        .toUpperCase()
+        .bold()} is equally strong as ${pokemon.name.toUpperCase().bold()}`;
+    }
+    messageToDom(msg);
+  }
+  async battle(pokemon) {
+    const UPDATE_INTERVAL = 2000;
+    const firstAttacker =
+      this.stats[5].base_stat > pokemon.stats[5].base_stat
+        ? {
+            attacker: this,
+            attackerId: "#card-one",
+            defender: pokemon,
+            defenderId: "#card-two",
+          }
+        : {
+            attacker: pokemon,
+            defender: this,
+            attackerId: "#card-two",
+            defenderId: "#card-one",
+          };
+    let attackerHp = firstAttacker.attacker.stats[0].base_stat;
+    updateHP(attackerHp, firstAttacker.attackerId);
+    let defenderHp = firstAttacker.defender.stats[0].base_stat;
+    updateHP(defenderHp, firstAttacker.defenderId);
+    while (attackerHp > 0 && defenderHp > 0) {
+      // Första attacken
+      let attackerDmg = attack(firstAttacker.attacker, firstAttacker.defender);
+      defenderHp -= attackerDmg;
+      punch(firstAttacker.attackerId);
+      if (defenderHp <= 0) {
+        updateHP(0, firstAttacker.defenderId);
+        winnerCard(firstAttacker.attackerId);
+        messageToDom(
+          `${firstAttacker.defender.name
+            .toUpperCase()
+            .bold()} fainted! ${firstAttacker.attacker.name
+            .toUpperCase()
+            .bold()} wins!`
+        );
+        break;
+      }
+      updateHP(defenderHp, firstAttacker.defenderId);
+      messageToDom(
+        `${firstAttacker.attacker.name.toUpperCase().bold()} used ${
+          firstAttacker.attacker.moves
+        } and did -${attackerDmg} hp.`
+      );
+
+      await wait(UPDATE_INTERVAL);
+
+      // counter-attack
+      let defenderDmg = attack(firstAttacker.defender, firstAttacker.attacker);
+      attackerHp -= defenderDmg;
+      punch(firstAttacker.defenderId);
+      if (attackerHp <= 0) {
+        updateHP(0, firstAttacker.attackerId);
+        winnerCard(firstAttacker.defenderId);
+        messageToDom(
+          `${firstAttacker.attacker.name
+            .toUpperCase()
+            .bold()} fainted! ${firstAttacker.defender.name
+            .toUpperCase()
+            .bold()} wins!`
+        );
+        break;
+      } else {
+        updateHP(attackerHp, firstAttacker.attackerId);
+        messageToDom(
+          `${firstAttacker.defender.name.toUpperCase().bold()} used ${
+            firstAttacker.defender.moves
+          } and did -${defenderDmg} hp.`
+        );
+      }
+      await wait(UPDATE_INTERVAL);
     }
   }
-  battle() {
-    console.log(this.moves);
+}
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function attack(attacker, defender) {
+  let damage =
+    attacker.stats[3].base_stat +
+    attacker.stats[1].base_stat -
+    (defender.stats[2].base_stat + defender.stats[4].base_stat) * 0.8;
+  damage = Math.round(damage);
+  if (damage < 10) {
+    damage = 10;
+  }
+  return damage;
+}
+
+function updateHP(newHp, cardId) {
+  let hpElement = document.querySelector(`${cardId} .hp`);
+  hpElement.innerHTML = `<span>HP</span> ${newHp}
+  `;
+}
+
+// function messageToDom(string) {
+//   let messageContainer = document.querySelector("#message-container");
+//   messageContainer.innerHTML = "";
+//   messageContainer.innerHTML = string;
+// }
+function messageToDom(string) {
+  let messageContainer = document.querySelector("#message-container");
+  messageContainer.style.backgroundColor = "#fff;";
+  messageContainer.style.boxshadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
+  messageContainer.innerHTML = "";
+  const words = string.split(" ");
+  let index = 0;
+  const intervalId = setInterval(() => {
+    if (index < words.length) {
+      let span = document.createElement("span");
+      span.innerHTML = words[index] + " ";
+      messageContainer.appendChild(span);
+      index++;
+    } else {
+      clearInterval(intervalId);
+    }
+  }, 200);
+}
+function extractValues(pokemon) {
+  let stats = pokemon.stats.map((stat) => stat.base_stat);
+  let weight = pokemon.weight;
+  let height = pokemon.height;
+  return { stats, weight, height }; // Returnera ett objekt med stats, weight och height
+}
+
+function winnerCard(id) {
+  let card = document.querySelector(id);
+  card.classList.add("winning-card");
+  setTimeout(() => {
+    card.classList.remove("winning-card");
+  }, 5000);
+}
+function punch(id) {
+  let card = document.querySelector(id);
+  if (id === "#card-one") {
+    card.classList.add("punch-to-two");
+    setTimeout(() => {
+      card.classList.remove("punch-to-two");
+    }, 1000);
+  } else {
+    card.classList.add("punch-to-one");
+    setTimeout(() => {
+      card.classList.remove("punch-to-one");
+    }, 1000);
   }
 }
 
 //Functions
 
+function saveToLocalStorage(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+function getFromLocalStorage(key) {
+  let data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : null;
+}
 async function getPokemonList(url) {
   try {
     const response = await axios.get(url);
@@ -120,9 +299,11 @@ function capturePokemon(object, id) {
 function assignOneOrTwo(pokemon, id) {
   switch (id) {
     case "one":
+      saveToLocalStorage("one", pokemon);
       pokemonOne = pokemon;
       break;
     case "two":
+      saveToLocalStorage("two", pokemon);
       pokemonTwo = pokemon;
       break;
     default:
@@ -206,11 +387,29 @@ async function handleSelectClick(url, id) {
   let pokemonObj = await getPokemonData(url);
   capturePokemon(pokemonObj, id);
   let pokemon = fetchOneOrTwo(id);
-  console.log(pokemon);
   createPokemonCard(pokemon, id);
+}
+async function handleDiceClick(num, id) {
+  let pokemonList = await getPokemonList(baseUrl);
+  let randomUrl = pokemonList[num].url;
+
+  let pokemonObj = await getPokemonData(randomUrl);
+  capturePokemon(pokemonObj, id);
+  let pokemon = fetchOneOrTwo(id);
+  createPokemonCard(pokemon, id);
+}
+function randomNumber(min, max) {
+  let num = Math.floor(Math.random() * (max - min + 1) + min);
+  return num;
+}
+function alternateString() {
+  let nextValue = alternateString.nextValue || "one";
+  alternateString.nextValue = nextValue === "one" ? "two" : "one";
+  return nextValue;
 }
 
 // KOD-FLOW & DOM
+
 populateDropdown(dropDownPokemonOne, dropDownPokemonTwo);
 
 dropDownPokemonOne.addEventListener("change", (event) => {
@@ -223,8 +422,29 @@ dropDownPokemonTwo.addEventListener("change", (event) => {
   let id = event.target.id.slice(-3);
   handleSelectClick(url, id);
 });
+
+// RandomButton
+
+diceButton.addEventListener("click", () => {
+  let num = randomNumber(0, 150);
+  let id = alternateString();
+  handleDiceClick(num, id);
+});
+
+// Compare Button
+
 compareButton.addEventListener("click", () => {
-  let messageContainer = document.querySelector("#message-container");
-  let msg = pokemonOne.compare(pokemonTwo);
-  messageContainer.textContent = msg;
+  pokemonOne.compare(pokemonTwo);
+});
+
+// PokeBall Button
+pokeballButton.addEventListener("click", () => {
+  let num = alternateString();
+  console.log(num);
+});
+
+// Battle Button
+
+battleButton.addEventListener("click", () => {
+  pokemonOne.battle(pokemonTwo);
 });

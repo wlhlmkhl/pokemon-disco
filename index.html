@@ -12,27 +12,43 @@
 
   <body>
     <header>
-      <div class="container">
-        <h1>Pokemon</h1>
+      <div class="title">
+        <img src="/assets/Logo/logo-18px.png" alt="PokemonDisco" />
       </div>
     </header>
     <main>
       <section>
         <div class="select-container">
           <select id="select-dropdown-one">
-            <option disabled selected>Choose One</option>
+            <option disabled selected>Choose a Pokemon</option>
           </select>
           <div class="card-container">
             <div id="card-one"></div>
           </div>
         </div>
         <div id="action-container">
-          <button id="compare-button">Compare</button>
-          <button id="battle-button">Battle!</button>
+          <button class="custom-button" id="dice-button">
+            <img
+              src="/assets/icons/icons8-dice-ios-17-glyph/icons8-dice-60.png"
+              alt="a dice"
+            />
+          </button>
+          <button id="compare-button" class="button primary-button">
+            Compare
+          </button>
+          <button class="custom-button" id="pokeball-button">
+            <img
+              src="/assets/icons/icons8-pokeball-color/pokeball-48.png"
+              alt="a poke ball"
+            />
+          </button>
+          <button id="battle-button" class="button secondary-button">
+            Battle!
+          </button>
         </div>
         <div class="select-container">
           <select id="select-dropdown-two">
-            <option disabled selected>Choose One</option>
+            <option disabled selected>Choose a Pokemon</option>
           </select>
           <div class="card-container">
             <div id="card-two"></div>
