@@ -1,7 +1,7 @@
 // Globals
 const typeColor = {
   bug: "#26de81",
-  dragon: "#ffeaa7",
+  dragon: "#006400",
   electric: "#fed330",
   fairy: "#FF0069",
   fighting: "#30336b",
@@ -237,13 +237,6 @@ function punch(id) {
 
 //Functions
 
-function saveToLocalStorage(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-function getFromLocalStorage(key) {
-  let data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : null;
-}
 async function getPokemonList(url) {
   try {
     const response = await axios.get(url);
@@ -392,7 +385,6 @@ async function handleSelectClick(url, id) {
 async function handleDiceClick(num, id) {
   let pokemonList = await getPokemonList(baseUrl);
   let randomUrl = pokemonList[num].url;
-
   let pokemonObj = await getPokemonData(randomUrl);
   capturePokemon(pokemonObj, id);
   let pokemon = fetchOneOrTwo(id);
@@ -434,17 +426,27 @@ diceButton.addEventListener("click", () => {
 // Compare Button
 
 compareButton.addEventListener("click", () => {
-  pokemonOne.compare(pokemonTwo);
+  if (pokemonTwo) {
+    pokemonOne.compare(pokemonTwo);
+  } else {
+    let msg = `You need to choose two pokemon to compare them.`;
+    messageToDom(msg);
+  }
 });
 
 // PokeBall Button
 pokeballButton.addEventListener("click", () => {
-  let num = alternateString();
-  console.log(num);
+  let msg = `Why are you clicking me? :S`;
+  messageToDom(msg);
 });
 
 // Battle Button
 
 battleButton.addEventListener("click", () => {
-  pokemonOne.battle(pokemonTwo);
+  if (pokemonTwo) {
+    pokemonOne.battle(pokemonTwo);
+  } else {
+    let msg = `You need two pokemon to do battle!`;
+    messageToDom(msg);
+  }
 });
